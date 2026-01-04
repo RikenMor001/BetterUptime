@@ -1,3 +1,4 @@
+// Using get and post request handlers from the poem crate
 use poem::{
     post, get, handler,
     listener::TcpListener,
@@ -8,18 +9,21 @@ use poem::{
 pub mod inputs;
 pub mod outputs;
 
+use store::Store;
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
 
 #[handler] // get request handler
-fn get_website(Path(name): Path<String>) -> String{
-    format!("BetterUptime: {name}")
+fn get_website(Path(website_id): Path<String>) -> String {
+    format!("BetterUptime: {website_id}")
 }
 
 #[handler] // post request handler
 async fn create_website(Json(data): Json<CreateWebsiteInput>) -> Json<CreateWebsiteOutput> {
+    let s: Store = Store{};
+    let id = s.create_website_id(); 
     let response = CreateWebsiteOutput {
-        url: data.url
+        id
     };
     Json(response)
 }
@@ -28,7 +32,7 @@ async fn create_website(Json(data): Json<CreateWebsiteInput>) -> Json<CreateWebs
 //function to run on the main thread of tokio runtime
 async fn main() -> Result<(), std::io::Error>{
     let app = Route::new()
-    .at("/website/:name", get(get_website))
+    .at("/website/:website_id", get(get_website)) // request params
     .at("/website", post(create_website));
 
     Server::new(TcpListener::bind("0.0.0.0:3000"))
@@ -36,3 +40,4 @@ async fn main() -> Result<(), std::io::Error>{
     .run(app)
     .await
 }
+
