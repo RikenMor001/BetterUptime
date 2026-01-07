@@ -1,13 +1,21 @@
-pub struct Store {
+use diesel::PgConnection;
+use std::env;
+pub mod schema;
+use diesel::prelude::*;
+use diesel::result::Error;
 
+pub struct Store {
+    pub conn: PgConnection
 }
 
 impl Store {
-    pub fn create_user(&self) {
+    fn default() -> Result<Self, Error> {
+        let db_url = env::var("DATABASE_URL")
+        .unwrap_or_else(|_| panic!("Please provide a database_url from the enviornment"));
 
-    }
-
-    pub fn create_website_id(&self) -> String{
-        String::from("1")
+        let conn:PgConnection = PgConnection::establish(&db_url)?;
+        Ok(Self {
+            conn
+        })
     }
 }
