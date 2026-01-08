@@ -1,6 +1,5 @@
 use std::env;
 use std::error::Error;
-use serde::Deserialize;
 
 pub struct Config {
     pub db_url: String
