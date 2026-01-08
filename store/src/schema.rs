@@ -5,13 +5,9 @@ pub mod sql_types {
 }
 
 diesel::table! {
-    region (id) {
-        id -> Text,
-        name -> Text,
-    }
-}
+    use diesel::sql_types::*;
+    use crate::schema::sql_types::WebsiteStatus;
 
-diesel::table! {
     website (id) {
         id -> Text,
         url -> Text,
@@ -21,7 +17,16 @@ diesel::table! {
 
 diesel::table! {
     use diesel::sql_types::*;
-    use super::sql_types::WebsiteStatus;
+
+    region (id) {
+        id -> Text,
+        name -> Text,
+    }
+}
+
+diesel::table! {
+    use diesel::sql_types::*;
+    use crate::schema::sql_types::WebsiteStatus;
 
     website_tick (id) {
         id -> Text,
@@ -36,7 +41,7 @@ diesel::joinable!(website_tick -> region (region_id));
 diesel::joinable!(website_tick -> website (website_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    region,
     website,
+    region,
     website_tick,
 );
