@@ -1,21 +1,24 @@
-use diesel::PgConnection;
-use std::env;
-pub mod schema;
 use diesel::prelude::*;
-use diesel::result::Error;
+use diesel::PgConnection;
+use diesel::result::ConnectionError;
+use dotenvy::dotenv;
+use std::env;
+
+pub mod schema;
 
 pub struct Store {
-    pub conn: PgConnection
+    pub conn: PgConnection,
 }
 
 impl Store {
-    fn default() -> Result<Self, Error> {
-        let db_url = env::var("DATABASE_URL")
-        .unwrap_or_else(|_| panic!("Please provide a database_url from the enviornment"));
+    pub fn new() -> Result<Self, ConnectionError> {
+        dotenv().ok();
 
-        let conn:PgConnection = PgConnection::establish(&db_url)?;
-        Ok(Self {
-            conn
-        })
+        let db_url = env::var("DATABASE_URL")
+            .expect("Please provide a DATABASE_URL in the environment");
+
+        let conn = PgConnection::establish(&db_url)?;
+
+        Ok(Self { conn })
     }
 }
