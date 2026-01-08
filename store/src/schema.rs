@@ -1,5 +1,3 @@
-// @generated automatically by Diesel CLI.
-
 pub mod sql_types {
     #[derive(diesel::query_builder::QueryId, Clone, diesel::sql_types::SqlType)]
     #[diesel(postgres_type(name = "website_status"))]
@@ -37,4 +35,8 @@ diesel::table! {
 diesel::joinable!(website_tick -> region (region_id));
 diesel::joinable!(website_tick -> website (website_id));
 
-diesel::allow_tables_to_appear_in_same_query!(region, website, website_tick,);
+diesel::allow_tables_to_appear_in_same_query!(
+    region,
+    website,
+    website_tick,
+);
