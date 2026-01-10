@@ -1,12 +1,20 @@
-use store::Store;
+use diesel::prelude::*;
+use crate::store::Store;
+#[derive(Queryable, Selectable, Insertable)]
+#[diesel(table_name = crate::schema::website)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+
+pub struct Website {
+    id: String, 
+    url: String,
+    user_id: Option<String>,
+    time_added: chrono::NaiveDateTime
+}
 
 impl Store {
     pub fn create_website(&self) {
-        println!("Create website called");
-        self.conn.execute("INSERT INTO website")
     }
 
-    pub fn get_website(&Self) -> String {
-        String::from("ID_OF_WEBSITE");
+    pub fn get_website(&self) {
     }
 }
