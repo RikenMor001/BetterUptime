@@ -5,6 +5,7 @@ use crate::store::Store;
 #[diesel(table_name = crate::schema::user)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 
+
 pub struct User {
     id: String, 
     username: String,
@@ -25,7 +26,17 @@ impl Store {
         Ok(id.to_string())
     }
 
-    pub fn sign_in(&self, username: String, password: String) {
+    pub fn sign_in(&mut self, ref_username: String, ref_password: String) -> Result<bool, diesel::result::Error> {
+        use crate::schema::user::dsl::*;
 
+        let user_data = user // fetches the user data and returns it
+        .filter(username.eq(ref_username))
+        .select(User::as_select())
+        .first(&mut self.conn)?;
+
+        if user_data.password != ref_password {
+            return Ok(false);
+        }
+        Ok(true)
     }
 }
