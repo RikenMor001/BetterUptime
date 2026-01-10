@@ -22,7 +22,7 @@ impl Store {
         };
         diesel::insert_into(crate::schema::user::table).values(&u)
         .returning(User::as_returning())
-        .get_result(&mut self.conn); // had to import Insertable
+        .get_result(&mut self.conn)?; // had to import Insertable
         Ok(id.to_string())
     }
 
