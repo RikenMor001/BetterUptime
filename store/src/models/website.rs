@@ -1,7 +1,7 @@
-use chrono::{NaiveDateTime, Utc};
-use diesel::prelude::*;
+use chrono::{ Utc };
+use diesel::{ prelude::* };
 use uuid::Uuid;
-use crate::{models::website, store::Store};
+use crate::{ store::Store };
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::website)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
@@ -29,7 +29,14 @@ impl Store {
         Ok(website_data)
     }
 
-    pub fn get_website(&self) {
-         
+    pub fn get_website(&mut self, ref_id: String) -> Result<Website, diesel::result::Error> {
+        use crate::schema::website::dsl::*;
+
+        let website_data = website
+        .filter(id.eq(ref_id))
+        .select(Website::as_select())
+        .first(&mut self.conn)?;
+    
+        Ok(website_data)
     }
 }
