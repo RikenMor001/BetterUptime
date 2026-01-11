@@ -30,6 +30,7 @@ async fn create_website(Json(data): Json<CreateWebsiteInput>) -> Json<CreateWebs
 #[tokio::main]  // Tokio main is a macro that is used for the main
 //function to run on the main thread of tokio runtime
 async fn main() -> Result<(), std::io::Error>{
+    dotenvy::dotenv().ok();
     let app = Route::new()
     .at("/website/:website_id", get(get_website)) // request params
     .at("/website", post(create_website));
