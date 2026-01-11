@@ -8,7 +8,6 @@ use poem::{
 
 pub mod inputs;
 pub mod outputs;
-
 use store::store::Store;
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
@@ -20,10 +19,10 @@ fn get_website(Path(website_id): Path<String>) -> String {
 
 #[handler] // post request handler
 async fn create_website(Json(data): Json<CreateWebsiteInput>) -> Json<CreateWebsiteOutput> {
-    let s: Store = Store::default();
-    let id = s.create_website(); 
+    let mut s: Store = Store::default();
+    let website = s.create_website(Some(String::from("a78d3a54-e03e-40bf-a929-4c439e46af91")), data.url).unwrap(); 
     let response = CreateWebsiteOutput {
-        id
+        id: website.id,
     };
     Json(response)
 }
