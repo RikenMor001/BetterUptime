@@ -1,4 +1,3 @@
-use diesel::prelude::*;
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use crate::config::Config;
