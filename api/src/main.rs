@@ -23,7 +23,7 @@ fn get_website(Path(website_id): Path<String>) -> String {
 async fn create_website(
     Json(data): Json<CreateWebsiteInput>,
 ) -> Result<Json<CreateWebsiteOutput>, Error> {
-    let mut s: Store = Store::default();
+    let mut s: Store = Store::default().unwrap();
 
     // Convert Diesel error into an HTTP 500 instead of crashing
     let website = s
