@@ -7,12 +7,12 @@ pub struct Store {
 }
 
 impl Store {
-    pub fn default() -> Self {
+    pub fn default() -> Result<Self, diesel::result::Error>{
         let config = Config::default();
 
         let conn = PgConnection::establish(&config.db_url).unwrap_or_else(|_| panic!("Error connecting to the database"));
-        Self{
-            conn
-        }
+        Ok((Self { 
+            conn 
+        }))
     } 
 }
