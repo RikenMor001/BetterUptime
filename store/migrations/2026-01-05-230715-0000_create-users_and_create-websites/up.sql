@@ -1,4 +1,3 @@
--- Your SQL goes here
 -- Create enum
 CREATE TYPE website_status AS ENUM ('Up', 'Down', 'Unknown');
 
@@ -6,7 +5,7 @@ CREATE TYPE website_status AS ENUM ('Up', 'Down', 'Unknown');
 CREATE TABLE website (
     id           TEXT        NOT NULL,
     url          TEXT        NOT NULL,
-    time_added   TIMESTAMPTZ NOT NULL,
+    time_added   TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT website_pkey PRIMARY KEY (id)
 );
 
@@ -19,10 +18,10 @@ CREATE TABLE region (
 
 -- website_tick table
 CREATE TABLE website_tick (
-    id                TEXT          NOT NULL,
-    website_id        TEXT          NOT NULL,
-    region_id         TEXT          NOT NULL,
-    response_time_ms  INTEGER       NOT NULL,
+    id                TEXT           NOT NULL,
+    website_id        TEXT           NOT NULL,
+    region_id         TEXT           NOT NULL,
+    response_time_ms  INTEGER        NOT NULL,
     status            website_status NOT NULL,
     CONSTRAINT website_tick_pkey PRIMARY KEY (id),
     CONSTRAINT website_tick_region_id_fkey
