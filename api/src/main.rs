@@ -1,43 +1,51 @@
 // Using get and post request handlers from the poem crate
 use poem::{
-    post, get, handler,
+    get, handler, post,
+    http::StatusCode,
     listener::TcpListener,
     web::{Json, Path},
-    Route, Server
+    Error, Route, Server,
 };
 
 pub mod inputs;
 pub mod outputs;
-use store::store::Store;
+
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
+use store::store::Store;
 
-#[handler] // get request handler
+#[handler]
 fn get_website(Path(website_id): Path<String>) -> String {
     format!("BetterUptime: {website_id}")
 }
 
-#[handler] // post request handler
-async fn create_website(Json(data): Json<CreateWebsiteInput>) -> Json<CreateWebsiteOutput> {
+#[handler]
+async fn create_website(
+    Json(data): Json<CreateWebsiteInput>,
+) -> Result<Json<CreateWebsiteOutput>, Error> {
     let mut s: Store = Store::default();
-    let website = s.create_website(Some(String::from("a78d3a54-e03e-40bf-a929-4c439e46af91")), data.url).unwrap(); 
-    let response = CreateWebsiteOutput {
-        id: website.id,
-    };
-    Json(response)
+
+    // Convert Diesel error into an HTTP 500 instead of crashing
+    let website = s
+        .create_website(
+            Some(String::from("a78d3a54-e03e-40bf-a929-4c439e46af91")),
+            data.url,
+        )
+        .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+
+    Ok(Json(CreateWebsiteOutput { id: website.id }))
 }
 
-#[tokio::main]  // Tokio main is a macro that is used for the main
-//function to run on the main thread of tokio runtime
-async fn main() -> Result<(), std::io::Error>{
+#[tokio::main]
+async fn main() -> Result<(), std::io::Error> {
     dotenvy::dotenv().ok();
+
     let app = Route::new()
-    .at("/website/:website_id", get(get_website)) // request params
-    .at("/website", post(create_website));
+        .at("/website/:website_id", get(get_website))
+        .at("/website", post(create_website));
 
     Server::new(TcpListener::bind("0.0.0.0:3000"))
-    .name("BetterUptime")
-    .run(app)
-    .await
+        .name("BetterUptime")
+        .run(app)
+        .await
 }
-
