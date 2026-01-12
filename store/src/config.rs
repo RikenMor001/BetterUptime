@@ -5,12 +5,12 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn default() -> Self {
+    pub fn default() -> Result<Self, diesel::result::Error> {
         let db_url = env::var("DATABASE_URL")
         .unwrap_or_else(|_| panic!("Please provide the database url enviornment variable"));
-        Self { 
+        Ok(Self{
             db_url
-        }
+        })
     }
 }
 
