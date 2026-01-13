@@ -1,18 +1,19 @@
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use crate::config::Config;
+use diesel::ConnectionError;
 
 pub struct Store {
     pub conn: PgConnection
 }
 
 impl Store {
-    pub fn default() -> Result<Self, diesel::result::Error>{
+    pub fn default() -> Result<Self, diesel::ConnectionError>{
         let config = Config::default();
 
-        let conn = PgConnection::establish(&config.db_url).unwrap_or_else(|_| panic!("Error connecting to the database"));
-        Ok((Self { 
+        let conn = PgConnection::establish(&config.db_url)?;
+        Ok(Self { 
             conn 
-        }))
+        }) // Write diesel::ConnectionError instead of unwrapping, makes it easy
     } 
 }
