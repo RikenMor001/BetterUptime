@@ -1,7 +1,6 @@
 use diesel::pg::PgConnection;
 use diesel::Connection;
 use crate::config::Config;
-use diesel::ConnectionError;
 
 pub struct Store {
     pub conn: PgConnection
