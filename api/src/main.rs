@@ -42,7 +42,7 @@ async fn create_website(
     // Convert Diesel error into an HTTP 500 instead of crashing
     let website = s
         .create_website(
-            Some(String::from("a78d3a54-e03e-40bf-a929-4c439e46af91")),
+            data.user_id,
             data.url,
         )
         .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
