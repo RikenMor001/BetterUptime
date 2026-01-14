@@ -6,6 +6,11 @@ pub struct CreateWebsiteOutput {
 }
 
 #[derive(Deserialize, Serialize)]
-pub struct CreateUserOutput{
-    pub id: String  
+pub struct CreateUserOutput {
+    pub id: String
+}
+
+pub struct CreateUserOutputSignin{
+    pub id: String,
+    pub msg: String
 }
