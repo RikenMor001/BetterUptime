@@ -40,14 +40,14 @@ fn sign_up(Json(data): Json<CreateUserInput>) -> Result<Json<CreateUserOutput>, 
 
 #[handler]
 fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOutputSignin>, Error> {
-    let s = Store::default()
-    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR));
+    let mut s = Store::default()
+    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
     let id = s.sign_in(data.ref_username, data.ref_password)
-    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR));
+    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
-    Ok(Json(CreateUserOutputSignIn{
-        id
+    Ok(Json(CreateUserOutputSignin{
+        id: id.to_string()
     }))
 }   
 
@@ -75,7 +75,8 @@ async fn main() -> Result<(), std::io::Error> {
     let app = Route::new()
         .at("/website/:website_id", get(get_website))
         .at("/website", post(create_website))
-        .at("/signup", post(sign_up));
+        .at("/signup", post(sign_up))
+        .at("/signin", post(sign_in));
 
     Server::new(TcpListener::bind("0.0.0.0:3000"))
         .name("BetterUptime")
