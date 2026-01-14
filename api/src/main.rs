@@ -22,7 +22,7 @@ fn get_website(Path(website_id): Path<String>) -> String {
 }
 
 #[handler]
-fn user_sign_in(Json(data): Json<CreateUserInput>) -> Result<Json<CreateUserOutput>, Error> {
+fn sign_up(Json(data): Json<CreateUserInput>) -> Result<Json<CreateUserOutput>, Error> {
     let mut s = Store::default()
         .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
@@ -56,7 +56,8 @@ async fn main() -> Result<(), std::io::Error> {
 
     let app = Route::new()
         .at("/website/:website_id", get(get_website))
-        .at("/website", post(create_website));
+        .at("/website", post(create_website))
+        .at("/signup", post(sign_up));
 
     Server::new(TcpListener::bind("0.0.0.0:3000"))
         .name("BetterUptime")
