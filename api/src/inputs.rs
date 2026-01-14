@@ -12,6 +12,7 @@ pub struct CreateUserInput{
     pub password: String
 }
 
+#[derive(Deserialize, Serialize)]
 pub struct CreateUserInputSignIn{
     pub ref_username: String,
     pub ref_password: String
