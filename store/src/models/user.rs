@@ -1,17 +1,23 @@
 use diesel::{prelude::*};
 use uuid::Uuid;
 use crate::store::Store;
-use argonautica::Hasher;
+use argonautica::{ Hasher, Verifier };
 use dotenv::dotenv;
 #[derive(Queryable, Selectable, Insertable)]
 #[diesel(table_name = crate::schema::user)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 
-
 pub struct User {
     id: String, 
     username: String,
     password: String
+}
+
+#[derive(Debug)]
+pub struct AuthError{
+    UserNotFound,
+    InvalidPassword,
+    Internal(String)
 }
 
 impl Store {
@@ -31,17 +37,32 @@ impl Store {
         Ok(id.to_string())
     }
 
-    pub fn sign_in(&mut self, ref_username: String, ref_password: String) -> Result<bool, diesel::result::Error> {
+    pub fn sign_in(&mut self, ref_username: String, ref_password: String) -> Result<String, diesel::result::Error> {
         use crate::schema::user::dsl::*;
 
         let user_data = user // fetches the user data and returns it
         .filter(username.eq(ref_username))
         .select(User::as_select())
-        .first(&mut self.conn)?;
+        .first(&mut self.conn)?
+        .map_err(|e| match e {
+            diesel::result::Error::NotFound => AuthError::UserNotFound,
+            _ => AuthError::Internal(e.to_string())
+        })?;
+        
+        let secret_message = std::default::var("SECRET_KEY")
+        .map_err(|e| AuthError::Internal(e.to_string()))?;
 
-        if user_data.password != ref_password {
-            return Ok(false);
+        let is_valid = Verifier::default()
+        .with_hash(user_data.password)
+        .with_password(ref_password)
+        .with_secret_key(secret_message)
+        .verify()
+        .unwrap_or(false);
+
+        if !is_valid {
+            return Err(AuthError::InvalidPassword);
         }
-        Ok(true)
+
+        Ok(user_data.id);
     }
 }
