@@ -14,7 +14,7 @@ pub struct User {
 }
 
 #[derive(Debug)]
-pub struct AuthError{
+pub enum AuthError{
     UserNotFound,
     InvalidPassword,
     Internal(String)
@@ -37,19 +37,19 @@ impl Store {
         Ok(id.to_string())
     }
 
-    pub fn sign_in(&mut self, ref_username: String, ref_password: String) -> Result<String, diesel::result::Error> {
+    pub fn sign_in(&mut self, ref_username: String, ref_password: String) -> Result<String, AuthError> {
         use crate::schema::user::dsl::*;
 
         let user_data = user // fetches the user data and returns it
-        .filter(username.eq(ref_username))
+        .filter(id.eq(ref_username))
         .select(User::as_select())
-        .first(&mut self.conn)?
+        .first(&mut self.conn)
         .map_err(|e| match e {
             diesel::result::Error::NotFound => AuthError::UserNotFound,
             _ => AuthError::Internal(e.to_string())
         })?;
         
-        let secret_message = std::default::var("SECRET_KEY")
+        let secret_message = std::env::var("SECRET_KEY")
         .map_err(|e| AuthError::Internal(e.to_string()))?;
 
         let is_valid = Verifier::default()
@@ -63,6 +63,6 @@ impl Store {
             return Err(AuthError::InvalidPassword);
         }
 
-        Ok(user_data.id);
+        Ok(user_data.id)
     }
 }
