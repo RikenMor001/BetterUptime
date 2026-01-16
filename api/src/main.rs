@@ -18,7 +18,7 @@ pub mod outputs;
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
 
-use store::store::Store;
+use store::{models::user::AuthError, store::Store};
 use crate::{ inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin} };
 
 #[handler]
@@ -43,12 +43,16 @@ fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOut
     let mut s = Store::default()
     .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
-    let id = s.sign_in(data.ref_username, data.ref_password)
-    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+    let user_id = s.sign_in(data.ref_username, data.ref_password)
+    .map_err(|e| match e {
+            AuthError::UserNotFound=>Error::from_string("User doesn't exist",StatusCode::NOT_FOUND),
+            AuthError::InvalidPassword => Error::from_string("Invalid password", StatusCode::UNAUTHORIZED),
+            AuthError::Internal(msg) => Error::from_string(msg, StatusCode::INTERNAL_SERVER_ERROR)
+        })?;    
 
     Ok(Json(CreateUserOutputSignin{
-        id: id.to_string(),
-        msg: String::from("User signed in")
+        id: user_id,
+        msg: "User signed in".to_string()
     }))
 }   
 
