@@ -1,8 +1,8 @@
 use serde::{Deserialize, Serialize};
-use Uuid::uuid;
 use jsonwebtoken::{encode, decode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use chrono::{Duration, Utc};
 
+#[derive(Deserialize, Serialize)]
 pub struct Jwt{
     // user_id, created_at, expired_at
     pub user_id: String,
@@ -11,6 +11,7 @@ pub struct Jwt{
 }
 
 // To create a jwt_token it requires user_id and secret
+
 pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::errors::Error>{
     let current_timestamp = Utc::now();
     let jwt_impl = Jwt{
@@ -23,7 +24,7 @@ pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::er
     encode(
         &Header::new(Algorithm::HS256),
         &jwt_impl,
-        &EncoidngKey::from_secret(secret.as_bytes())
+        &EncodingKey::from_secret(secret.as_bytes())
     )
 }
 
