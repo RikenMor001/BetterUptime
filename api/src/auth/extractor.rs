@@ -7,7 +7,8 @@ use poem::{
     FromRequest, Request, RequestBody, Result,
     http::StatusCode
 };
-use crate::auth::jwt::verify_jwt;
+
+use crate::validation::verify_jwt;
 
 pub struct AuthUser{
     pub user_id: String
@@ -41,6 +42,26 @@ impl <'a> FromRequest<'a> for AuthUser{
             None => {
                 Err(Error::from_string(
                     "Expected a bearer token in string format",
+                    StatusCode::UNAUTHORIZED
+                ))
+            }
+        };
+
+        let jwt_secret = match std::env::var("JWT_SECRET"){
+            Some(s) => s,
+            None => {
+                Err(Error::from_string(
+                    "JWT_SECRET missing",
+                    StatusCode::INTERNAL_SERVER_ERROR
+                ))
+            }
+        };
+
+        let verify_token = match verify_jwt(extract_token, jwt_secret){
+            Some(v) => v,
+            None => {
+                Err(Error::from_string(
+                    "Unable to verify token",
                     StatusCode::UNAUTHORIZED
                 ))
             }
