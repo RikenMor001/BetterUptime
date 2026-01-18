@@ -5,10 +5,11 @@ edition = "2024"
 
 [dependencies]
 jsonwebtoken = { version = "10.2.0", features = ["rust_crypto"] }
-poem = "3.1.12"
+poem = {version = "3.1.12", features=["async-trait"]}
 serde = { version = "1.0.228", features = ["derive"] }
 tokio = { version = "1.49.0", features = ["full"] }
 store = { path = "../store" }
 dotenvy = "0.15"
 diesel = { version = "2.2.0", features = ["postgres"] }
 chrono = "0.4.43"
+async-trait = "0.1"
