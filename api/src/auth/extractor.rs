@@ -57,7 +57,7 @@ impl <'a> FromRequest<'a> for AuthUser{
             }
         };
 
-        let verify_token = match verify_jwt(extract_token, jwt_secret){
+        let jwt = match verify_jwt(extract_token, jwt_secret){
             Some(v) => v,
             None => {
                 Err(Error::from_string(
@@ -66,5 +66,9 @@ impl <'a> FromRequest<'a> for AuthUser{
                 ))
             }
         };
+
+        Ok(AuthUser{
+            user_id: verify_token.sub
+        })
     }
 }
