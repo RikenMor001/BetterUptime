@@ -10,6 +10,7 @@ pub struct Jwt{
     pub jwt_expired_at: usize
 }
 
+// To create a jwt_token it requires user_id and secret
 pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::errors::Error>{
     let current_timestamp = Utc::now();
     let jwt_impl = Jwt{
@@ -18,6 +19,7 @@ pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::er
         jwt_expired_at: (current_timestamp + Duration::hours(24)).timestamp() as usize
     };
 
+    // Encode creates a JWt string, it asks for these 3 arguments
     encode(
         &Header::new(Algorithm::HS256),
         &jwt_impl,
@@ -25,6 +27,7 @@ pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::er
     )
 }
 
+// To verify jwt token and secret are the 2 things required
 pub fn verify_jwt(token: &str, secret: &str) -> Result<Jwt, jsonwebtoken::errors::Error> {
     let validation = Validation::new(Algorithm::HS256);
 
