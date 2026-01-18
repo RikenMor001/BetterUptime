@@ -29,9 +29,9 @@ impl <'a> FromRequest<'a> for AuthUser{
 
         let auth_string = match auth_header.to_str(){
             Ok(s) => s,
-            None => {
+            Err(_) => {
                 return Err(Error::from_string(
-                    "Missing Authorization header",
+                    "Invalid Authorizaiton header",
                     StatusCode::UNAUTHORIZED
                 ))
             }
@@ -48,20 +48,20 @@ impl <'a> FromRequest<'a> for AuthUser{
         };
         
         let jwt_secret = match std::env::var("JWT_SECRET"){
-            Some(s) => s,
-            None => {
+            Ok(s) => s,
+            Err(_) => {
                 return Err(Error::from_string(
-                    "JWT_SECRET missing",
-                    StatusCode::INTERNAL_SERVER_ERROR
+                    "JWT_SECRET not found",
+                    StatusCode::INTERNAL_SEVER_ERROR
                 ))
             }
         };
 
-        let jwt = match verify_jwt(extract_token, jwt_secret){
-            Some(v) => v,
-            None => {
+        let jwt = match verify_jwt(extract_token, &jwt_secret){
+            Ok(v) => v,
+            Err(_) => {
                 return Err(Error::from_string(
-                    "Unable to verify token",
+                    "Invalid or expired token",
                     StatusCode::UNAUTHORIZED
                 ))
             }
