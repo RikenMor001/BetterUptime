@@ -34,9 +34,9 @@ pub fn verify_jwt(token: &str, secret: &str) -> Result<Jwt, jsonwebtoken::errors
 
     let data = decode::<Jwt>(
         token,
-        DecodingKey::from_secret(secret.as_bytes()),
+        &DecodingKey::from_secret(secret.as_bytes()),
         &validation
     )?;
 
-    Ok(data.jwt_impl)
+    Ok(data.claims)
 }
