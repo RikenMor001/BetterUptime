@@ -14,7 +14,6 @@ pub struct AuthUser{
     pub user_id: String
 }
 
-#[poem::async_trait]
 impl <'a> FromRequest<'a> for AuthUser{
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
         let auth_header = match req.headers().get("Authorization"){
@@ -52,7 +51,7 @@ impl <'a> FromRequest<'a> for AuthUser{
             Err(_) => {
                 return Err(Error::from_string(
                     "JWT_SECRET not found",
-                    StatusCode::INTERNAL_SEVER_ERROR
+                    StatusCode::UNAUTHORIZED
                 ))
             }
         };
@@ -68,7 +67,7 @@ impl <'a> FromRequest<'a> for AuthUser{
         };
 
         Ok(AuthUser{
-            user_id: verify_token.sub
+            user_id: jwt.user_id
         })
     }
 }
