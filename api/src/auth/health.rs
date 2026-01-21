@@ -6,14 +6,9 @@ pub struct UserExists{
     user_id: String
 }
 
-pub fn check_user_existense(user_id: String) -> Result<bool, diesel::result::Error>{
+pub fn check_user_existense(user_id: String) -> Result<String, diesel::result::Error>{
     let user_check = AuthUser{
-        user_id: UserExists?
+        user_id: user_id
     };
-
-    if user_check{
-       return true 
-    }
-    return false
+    
 }
-
