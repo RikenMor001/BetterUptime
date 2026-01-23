@@ -14,7 +14,7 @@ pub fn check_user_health(user_id: String) -> Result<(bool, String), diesel::Conn
     .first::<String>(conn)
     .optional();
 
-    match user{
+    match found{
         Some(_) => Ok((true, "User exists and server is up".to_string())),
         None(_) => Ok((false, "Either user doesn't exist or the server is down".to_string())),
     }
