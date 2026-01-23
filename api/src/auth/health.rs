@@ -3,16 +3,16 @@ use store::store::Store;
 use store::schema::user::dsl::*;
 
 // Check connection 
-pub fn check_user_health(user_id: String) -> Result<(bool, String), diesel::result::Error> {
+pub fn check_user_health(user_id: String) -> Result<(bool, String), diesel::ConnectionError> {
     let mut store = Store::default()?;
     let conn = &mut store.conn;
 
     // users.fiilter.select.first.optional
-    let user = users
+    let found = user
     .filter(id.eq(&user_id))
     .select(id)
     .first::<String>(conn)
-    .optional()?;
+    .optional();
 
     match user{
         Some(_) => Ok((true, "User exists and server is up".to_string())),
