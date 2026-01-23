@@ -1,20 +1,9 @@
 use diesel::prelude::*;
-use crate::store::Store;
-use crate::schema::users::dsl::*;
+use store::store::Store;
+use store::schema::user::dsl::*;
 
-pub fn check_user_existence( user_id: String ) -> Result<(bool, String), diesel::result::Error> {
-
-    let mut store = Store::new()?;   // DB/server check
+// Check connection 
+pub fn check_user_health(user_id: String) -> Result<(bool, String), diesel::result::Error> {
+    let mut store = Store::default()?;
     let conn = &mut store.conn;
-
-    let user = users
-        .filter(id.eq(&user_id))
-        .select(id)
-        .first::<String>(conn)
-        .optional()?;   // avoids NotFound error
-
-    match user {
-        Some(_) => Ok((true, "User exists and server is up".to_string())),
-        None => Ok((false, "User does not exist".to_string())),
-    }
 }
