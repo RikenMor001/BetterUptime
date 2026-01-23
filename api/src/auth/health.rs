@@ -1,16 +1,20 @@
-// Check whether if the user exists
 use diesel::prelude::*;
-use store::schema::user;
-use crate::Store::default::conn;
+use crate::store::Store;
+use crate::schema::users::dsl::*;
 
-pub fn check_user_existense(user_id: String) -> Result<(bool, String), diesel::result::Error>{
-    let mut checkConn = conn()?;
+pub fn check_user_existence( user_id: String ) -> Result<(bool, String), diesel::result::Error> {
 
-    // Will get the user from the database
-    // Try to match the user if they match correctly
+    let mut store = Store::new()?;   // DB/server check
+    let conn = &mut store.conn;
 
-    match user{
-        Some(_) => Ok(true ,"User exists in the database".to_string()),
-        None(_) => Ok(false, "User does not exist or the server is down".to_string());
-    };
+    let user = users
+        .filter(id.eq(&user_id))
+        .select(id)
+        .first::<String>(conn)
+        .optional()?;   // avoids NotFound error
+
+    match user {
+        Some(_) => Ok((true, "User exists and server is up".to_string())),
+        None => Ok((false, "User does not exist".to_string())),
+    }
 }
