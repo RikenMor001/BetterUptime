@@ -15,3 +15,10 @@ pub struct CreateUserOutputSignin{
     pub id: String,
     pub msg: String
 }
+
+#[derive(Deserialize, Serialize)]
+pub struct HealthResponse{
+    pub up: bool,
+    pub user_exists: bool,
+    pub message: String
+}
