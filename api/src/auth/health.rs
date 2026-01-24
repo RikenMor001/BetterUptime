@@ -2,7 +2,6 @@ use diesel::prelude::*;
 use store::store::Store;
 use store::schema::user::dsl::*;
 
-// Making a custom enum 
 pub enum HealthError{
     Connection(diesel::ConnectionError),
     Query(diesel::result::Error)
