@@ -5,11 +5,7 @@
 
 // Using get and post request handlers from the poem library
 use poem::{
-    get, handler, post,
-    http::StatusCode,
-    listener::TcpListener,
-    web::{Json, Path},
-    Error, Route, Server,
+    Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path, Query}
 };
 
 pub mod auth;
@@ -86,7 +82,15 @@ fn health(Path(user_id): Path<String>) -> Result<Json<HealthResponse>, Error>{
             up: true, 
             user_exists: false, 
             message: msg 
-        }))
+        })),
+        
+        Err(HealthError::Connection(e)) => Err(
+            Error::from_string(e.to_string(), StatusCode::SERVICE_UNAVAILABLE)
+        ),
+
+        Err(HealthError ::Query(e)) => Err(
+            Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
+        )
     }
 }
 
