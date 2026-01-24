@@ -99,6 +99,7 @@ async fn main() -> Result<(), std::io::Error> {
     dotenvy::dotenv().ok();
 
     let app = Route::new()
+        .at("/health/:user_id", get(health))
         .at("/website/:website_id", get(get_website))
         .at("/website", post(create_website))
         .at("/signup", post(sign_up))
