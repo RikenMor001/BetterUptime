@@ -12,14 +12,16 @@ use poem::{
     Error, Route, Server,
 };
 
+pub mod auth;
 pub mod inputs;
 pub mod outputs;
 
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
 
-use store::{models::user::AuthError, store::Store};
-use crate::{ inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin} };
+use store::{ models::user::AuthError, store::Store };
+use crate::{ inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
+use crate::auth::health::{check_user_health, HealthError};
 
 #[handler]
 fn get_website(Path(website_id): Path<String>) -> String {
@@ -57,9 +59,7 @@ fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOut
 }   
 
 #[handler]
-async fn create_website(
-    Json(data): Json<CreateWebsiteInput>
-) -> Result<Json<CreateWebsiteOutput>, Error> {
+async fn create_website(Json(data): Json<CreateWebsiteInput> ) -> Result<Json<CreateWebsiteOutput>, Error> {
     let mut s: Store = Store::default().unwrap();
 
     // Convert Diesel error into an HTTP 500 instead of crashing
@@ -71,6 +71,23 @@ async fn create_website(
         .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
     Ok(Json(CreateWebsiteOutput { id: website.id }))
+}
+
+#[handler]
+fn health(Path(user_id): Path<String>) -> Result<Json<HealthResponse>, Error>{
+    match check_user_health(user_id) {
+        Ok((true, msg)) => Ok(Json(HealthResponse { 
+            up: true, 
+            user_exists: true, 
+            message: msg 
+        })),
+
+        Ok((false, msg)) => Ok(Json(HealthResponse { 
+            up: true, 
+            user_exists: false, 
+            message: msg 
+        }))
+    }
 }
 
 #[tokio::main]
