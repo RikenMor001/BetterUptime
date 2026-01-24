@@ -16,7 +16,7 @@ use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
 
 use store::{ models::user::AuthError, store::Store };
-use crate::{ inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
+use crate::{ auth::validation::sign_jwt, inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
 use crate::auth::health::{check_user_health, HealthError};
 
 #[handler]
@@ -48,9 +48,16 @@ fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOut
             AuthError::Internal(msg) => Error::from_string(msg, StatusCode::INTERNAL_SERVER_ERROR)
         })?;    
 
+    let jwt_secret = std::env::var("JWT_SECRET")
+    .map_err(|_| Error::from_string("JWT_SECRET not found", StatusCode::INTERNAL_SERVER_ERROR))?; // Make sure to unwrap the secret
+
+    let token = sign_jwt(&user_id, &jwt_secret)
+    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+
     Ok(Json(CreateUserOutputSignin{
         id: user_id,
-        msg: "User signed in".to_string()
+        msg: "User signed in".to_string(),
+        token
     }))
 }   
 
