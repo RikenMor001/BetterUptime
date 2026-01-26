@@ -13,7 +13,8 @@ pub struct CreateUserOutput {
 #[derive(Deserialize, Serialize)]
 pub struct CreateUserOutputSignin{
     pub id: String,
-    pub msg: String
+    pub msg: String,
+    pub token: String
 }
 
 #[derive(Deserialize, Serialize)]
