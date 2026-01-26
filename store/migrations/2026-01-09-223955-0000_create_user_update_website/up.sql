@@ -6,6 +6,10 @@ CREATE TABLE "user" (
     CONSTRAINT user_pkey PRIMARY KEY (id)
 );
 
+-- Making username unique
+ALTER TABLE "user"
+ADD CONSTRAINT user_username_unique UNIQUE(username);
+
 -- Add user_id to website
 ALTER TABLE website
 ADD COLUMN user_id TEXT;
