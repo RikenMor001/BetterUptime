@@ -35,13 +35,20 @@ fn sign_up(Json(data): Json<CreateUserInput>) -> Result<Json<CreateUserOutput>, 
         .map_err(|e| {
             match e {
                 DieselError::DatabaseError(DatabaseErrorKind::UniqueViolation, _) => {
-                    Error::from_string("User already exists", StatusCode::CONFLICT) // Returns 409
+                    Error::from_string("User already exists", StatusCode::CONFLICT) // Returns 409 
                 }
                 _=> Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
             }
         })?;
 
-    Ok(Json(CreateUserOutput { id }))
+        Ok(
+            Json(
+                CreateUserOutput { 
+                    id, 
+                    msg: "User signed up".to_string() 
+                }
+            )
+        )
 }
 
 #[handler]
