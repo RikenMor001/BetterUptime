@@ -26,7 +26,7 @@ pub fn check_user_health(user_id: String) -> Result<(bool, String), HealthError>
 
     // users.fiilter.select.first.optional
     let found = user
-    .filter(id.eq(&user_id))
+    .filter(username.eq(&user_id))
     .select(id)
     .first::<String>(conn)
     .optional()?;
