@@ -5,7 +5,7 @@
 
 // Using get and post request handlers from the poem library
 use poem::{
-    Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path, Query}
+    Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path}
 };
 
 pub mod auth;
@@ -15,9 +15,10 @@ pub mod outputs;
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
 
-use store::{ models::user::AuthError, store::Store };
+use store::{ models::user::{AuthError}, store::Store };
 use crate::{ auth::validation::sign_jwt, inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
 use crate::auth::health::{check_user_health, HealthError};
+use diesel::result::{Error as DieselError, DatabaseErrorKind};
 
 #[handler]
 fn get_website(Path(website_id): Path<String>) -> String {
@@ -31,7 +32,14 @@ fn sign_up(Json(data): Json<CreateUserInput>) -> Result<Json<CreateUserOutput>, 
 
     let id = s
         .sign_up(data.username, data.password)
-        .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+        .map_err(|e| {
+            match e {
+                DieselError::DatabaseError(DatabaseErrorKind::UniqueViolation, _) => {
+                    Error::from_string("User already exists", StatusCode::CONFLICT) // Returns 409
+                }
+                _=> Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
+            }
+        })?;
 
     Ok(Json(CreateUserOutput { id }))
 }
