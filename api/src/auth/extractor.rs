@@ -16,7 +16,7 @@ pub struct AuthUser{
 
 impl <'a> FromRequest<'a> for AuthUser{
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
-        let auth_header = match req.headers().get("Authorization"){
+        let auth_header = match req.headers().get("authorization"){
             Some(h) => h,
             None => {
                 return Err(Error::from_string(
