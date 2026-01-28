@@ -1,41 +1,43 @@
-use serde::{Deserialize, Serialize};
-use jsonwebtoken::{encode, decode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+// validation.rs
 use chrono::{Duration, Utc};
+use jsonwebtoken::{decode, encode, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
-pub struct Jwt{
-    // user_id, created_at, expired_at
-    pub user_id: String,
-    pub jwt_created_at: usize,
-    pub jwt_expired_at: usize
+#[derive(Debug, Deserialize, Serialize)]
+pub struct Jwt {
+    // Standard claims:
+    // sub = subject (user id), iat = issued at, exp = expires at
+    pub sub: String,
+    pub iat: i64,
+    pub exp: i64,
 }
 
-// To create a jwt_token it requires user_id and secret
+pub fn sign_jwt(user_id: &str, secret: &str) -> Result<String, jsonwebtoken::errors::Error> {
+    let now = Utc::now().timestamp();
 
-pub fn sign_jwt(user_id: &str, secret: &str) -> Result <String, jsonwebtoken::errors::Error>{
-    let current_timestamp = Utc::now();
-    let jwt_impl = Jwt{
-        user_id: user_id.to_string(),
-        jwt_created_at: current_timestamp.timestamp() as usize,
-        jwt_expired_at: (current_timestamp + Duration::hours(24)).timestamp() as usize
+    let claims = Jwt {
+        sub: user_id.to_string(),
+        iat: now,
+        exp: (Utc::now() + Duration::hours(24)).timestamp(),
     };
 
-    // Encode creates a JWt string, it asks for these 3 arguments
     encode(
         &Header::new(Algorithm::HS256),
-        &jwt_impl,
-        &EncodingKey::from_secret(secret.as_bytes())
+        &claims,
+        &EncodingKey::from_secret(secret.as_bytes()),
     )
 }
 
-// To verify jwt token and secret are the 2 things required
 pub fn verify_jwt(token: &str, secret: &str) -> Result<Jwt, jsonwebtoken::errors::Error> {
-    let validation = Validation::new(Algorithm::HS256);
+    let mut validation = Validation::new(Algorithm::HS256);
+
+    // Enforce `exp` validation (it is typically validated if present, but be explicit).
+    validation.validate_exp = true;
 
     let data = decode::<Jwt>(
         token,
         &DecodingKey::from_secret(secret.as_bytes()),
-        &validation
+        &validation,
     )?;
 
     Ok(data.claims)
