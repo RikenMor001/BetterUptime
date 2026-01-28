@@ -1,73 +1,88 @@
-// Get authorization header, convert header to a string,
-// extract bearer token, load the jwt secret,
-// verify the jwt signature, return authenticated user
-
+// extractor.rs
 use poem::{
     error::Error,
+    http::{header, StatusCode},
     FromRequest, Request, RequestBody, Result,
-    http::StatusCode
 };
 
 use crate::auth::validation::verify_jwt;
 
-pub struct AuthUser{
-    pub user_id: String
+pub struct AuthUser {
+    pub user_id: String,
 }
 
-impl <'a> FromRequest<'a> for AuthUser{
+impl<'a> FromRequest<'a> for AuthUser {
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
-        let auth_header = match req.headers().get("authorization"){
+        // Prefer typed header name
+        let auth_header = match req.headers().get(header::AUTHORIZATION) {
             Some(h) => h,
             None => {
                 return Err(Error::from_string(
-                    "Missing Authorization headers",
-                    StatusCode::UNAUTHORIZED
+                    "Missing Authorization header",
+                    StatusCode::UNAUTHORIZED,
                 ))
             }
         };
 
-        let auth_string = match auth_header.to_str(){
-            Ok(s) => s,
+        let auth_string = match auth_header.to_str() {
+            Ok(s) => s.trim(),
             Err(_) => {
                 return Err(Error::from_string(
-                    "Invalid Authorizaiton header",
-                    StatusCode::UNAUTHORIZED
+                    "Invalid Authorization header",
+                    StatusCode::UNAUTHORIZED,
                 ))
             }
         };
 
-        let extract_token = match auth_string.strip_prefix("Bearer "){
-            Some(t) => t,
-            None => {
+        // Be tolerant: accept Bearer/bearer and extra spaces
+        let token = {
+            // Split by whitespace: "Bearer <token>"
+            let mut parts = auth_string.split_whitespace();
+            let scheme = parts.next().unwrap_or("");
+            let t = parts.next().unwrap_or("");
+
+            if !scheme.eq_ignore_ascii_case("bearer") || t.is_empty() {
                 return Err(Error::from_string(
-                    "Expected a bearer token in string format",
-                    StatusCode::UNAUTHORIZED
-                ))
+                    "Expected: Authorization: Bearer <token>",
+                    StatusCode::UNAUTHORIZED,
+                ));
             }
+
+            // If there are extra segments, treat as invalid (helps catch malformed headers)
+            if parts.next().is_some() {
+                return Err(Error::from_string(
+                    "Malformed Authorization header",
+                    StatusCode::UNAUTHORIZED,
+                ));
+            }
+
+            t
         };
-        
-        let jwt_secret = match std::env::var("JWT_SECRET"){
-            Ok(s) => s,
-            Err(_) => {
+
+        let jwt_secret = match std::env::var("JWT_SECRET") {
+            Ok(s) if !s.trim().is_empty() => s,
+            _ => {
                 return Err(Error::from_string(
                     "JWT_SECRET not found",
-                    StatusCode::UNAUTHORIZED
+                    StatusCode::UNAUTHORIZED,
                 ))
             }
         };
 
-        let jwt = match verify_jwt(extract_token, &jwt_secret){
+        let jwt = match verify_jwt(token, &jwt_secret) {
             Ok(v) => v,
-            Err(_) => {
+            Err(e) => {
+                // Keep client error generic, but log the real reason (helpful in dev)
+                eprintln!("JWT verify error: {e}");
                 return Err(Error::from_string(
                     "Invalid or expired token",
-                    StatusCode::UNAUTHORIZED
-                ))
+                    StatusCode::UNAUTHORIZED,
+                ));
             }
         };
 
-        Ok(AuthUser{
-            user_id: jwt.user_id
+        Ok(AuthUser {
+            user_id: jwt.sub,
         })
     }
 }
