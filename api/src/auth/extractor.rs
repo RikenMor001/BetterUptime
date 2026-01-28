@@ -1,4 +1,3 @@
-// extractor.rs
 use poem::{
     error::Error,
     http::{header, StatusCode},
