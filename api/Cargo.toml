@@ -12,3 +12,4 @@ store = { path = "../store" }
 dotenvy = "0.15"
 diesel = { version = "2.2.0", features = ["postgres"] }
 chrono = "0.4.43"
+reqwest = { version = "0.13.1", features = ["json", "rustls-tls"]}
