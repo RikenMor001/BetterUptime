@@ -70,7 +70,7 @@ fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOut
     .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
     Ok(Json(CreateUserOutputSignin{
-        id: user_id,
+        id: user_id.to_owned(),
         msg: "User signed in".to_string(),
         token
     }))
