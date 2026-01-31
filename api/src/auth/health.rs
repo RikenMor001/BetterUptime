@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use diesel::prelude::*;
 use store::store::Store;
 use store::schema::user::dsl::*;
@@ -19,6 +21,13 @@ impl From<diesel::result::Error> for HealthError{
     }
 }       
 
+pub struct WebsiteHealthResult{
+    pub up:bool,
+    pub response_time:u128,
+    pub status_code: Option<u16>,
+    pub error: Option<String>
+}
+
 // Check connection 
 pub fn check_user_health(user_id: String) -> Result<(bool, String), HealthError> {
     let mut store = Store::default()?;
@@ -35,4 +44,22 @@ pub fn check_user_health(user_id: String) -> Result<(bool, String), HealthError>
         Some(_) => Ok((true, "User exists and server is up".to_string())),
         None => Ok((false, "User does not exist".to_string()))
     }
+}
+
+pub async fn check_website_health(url: &str) -> Result<WebsiteHealthResult, String>{
+    let client = reqwest::Client::new();
+    let start = Instant::now();
+
+    let response = client
+    .get(url)
+    .send()
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(WebsiteHealthResult {
+        up: response.status().is_success(),
+        response_time: start.elapsed().as_millis(),
+        status_code: Some(response.status().as_u16()),
+        error:None
+    })
 }
