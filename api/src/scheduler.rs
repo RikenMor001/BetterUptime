@@ -1,8 +1,7 @@
 use tokio::time::{interval, Duration};
-use crate::store::store::Store;
-use crate::health::check_website_health;
+use store::store::Store;
 
-fn start_scheduler(){
+pub fn start_scheduler(){
     tokio::spawn(async move {
         let mut ticker = interval(Duration::from_secs(60));
 
@@ -41,5 +40,5 @@ fn start_scheduler(){
                 }
             }
         }
-    })
+    });
 }
