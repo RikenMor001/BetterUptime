@@ -11,6 +11,7 @@ use poem::{
 pub mod auth;
 pub mod inputs;
 pub mod outputs;
+pub mod scheduler;
 
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
