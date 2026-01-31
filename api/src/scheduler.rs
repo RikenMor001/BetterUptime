@@ -1,6 +1,8 @@
 use tokio::time::{interval, Duration};
 use store::store::Store;
 
+use crate::auth::health::check_website_health;
+
 pub fn start_scheduler(){
     tokio::spawn(async move {
         let mut ticker = interval(Duration::from_secs(60));
@@ -31,7 +33,7 @@ pub fn start_scheduler(){
                     Ok(result) => {
                         println!(
                             "[check] {} up={} latency={}ms",
-                            url, result.up, result.response_time_ms
+                            url, result.up, result.response_time
                         );
                     }
                     Err(e) => {
