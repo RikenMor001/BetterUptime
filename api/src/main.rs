@@ -15,7 +15,6 @@ pub mod scheduler;
 
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
-
 use store::{ models::user::{AuthError}, store::Store };
 use crate::{ auth::validation::sign_jwt, inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
 use crate::auth::health::{check_user_health, HealthError};
@@ -79,7 +78,9 @@ fn sign_in(Json(data): Json<CreateUserInputSignIn>) -> Result<Json<CreateUserOut
 
 #[handler]
 async fn create_website(Json(data): Json<CreateWebsiteInput> ) -> Result<Json<CreateWebsiteOutput>, Error> {
-    let mut s: Store = Store::default().unwrap();
+
+    let mut s: Store = Store::default()
+    .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
     // Convert Diesel error into an HTTP 500 instead of crashing
     let website = s
@@ -120,6 +121,7 @@ fn health(Path(user_id): Path<String>) -> Result<Json<HealthResponse>, Error>{
 #[tokio::main]
 async fn main() -> Result<(), std::io::Error> {
     dotenvy::dotenv().ok();
+    scheduler::start_scheduler();
 
     let app = Route::new()
         .at("/health/:user_id", get(health))
