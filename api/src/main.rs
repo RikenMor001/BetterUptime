@@ -164,7 +164,8 @@ async fn main() -> Result<(), std::io::Error> {
         .at("/website/:website_id", get(get_website))
         .at("/website", post(create_website))
         .at("/signup", post(sign_up))
-        .at("/signin", post(sign_in));
+        .at("/signin", post(sign_in))
+        .at("/website/health", post(website_health));
 
     Server::new(TcpListener::bind("0.0.0.0:3000"))
         .name("BetterUptime")
