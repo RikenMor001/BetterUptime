@@ -1,11 +1,10 @@
 // TODO
-//1. Add authenctication to the current codebase first and then follow up with the other two TODO's 
-//2. Adding response time and letting developer know if the website/API/server is up right now
-//3. Adding a system that sends notifications via email to let the developer know that the system is down
+// 1. When creating a website instead of putting the user id obtained after signing up the user should be putting their username 
+// 2. Adding a system that sends notifications via email to let the developer know that the system is down
 
 // Using get and post request handlers from the poem library
 use poem::{
-    Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path}
+    Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path, Query}
 };
 
 pub mod auth;
@@ -15,10 +14,11 @@ pub mod scheduler;
 
 use inputs::CreateWebsiteInput;
 use outputs::CreateWebsiteOutput;
+use serde::{Deserialize, Serialize};
 use store::{ models::user::{AuthError}, store::Store };
-use crate::{ auth::validation::sign_jwt, inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
+use crate::{ auth::{health::{WebsiteHealthResult, check_website_health}, validation::sign_jwt}, inputs::{CreateUserInput, CreateUserInputSignIn}, outputs::{CreateUserOutput, CreateUserOutputSignin, HealthResponse} };
 use crate::auth::health::{check_user_health, HealthError};
-use diesel::result::{Error as DieselError, DatabaseErrorKind};
+use diesel::{ result::{DatabaseErrorKind, Error as DieselError}};
 
 #[handler]
 fn get_website(Path(website_id): Path<String>) -> String {
@@ -115,6 +115,28 @@ fn health(Path(user_id): Path<String>) -> Result<Json<HealthResponse>, Error>{
         Err(HealthError ::Query(e)) => Err(
             Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)
         )
+    }
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct Website_check_query{
+    url: String
+}
+
+#[handler]
+async fn  website_health(Query(q): Query<Website_check_query>) -> Result<Query<WebsiteHealthResult>, Error> {
+    match check_website_health(&q.url).await{
+        Ok(result) => {
+            println!(
+                "[WEBSITE HEALTH] url={} up={} status={:?} response_time={}ms"
+                q.url,
+                result.up,
+                result.status_code,
+                result.response_time
+            )
+        };
+        
+        Ok(Json(result))
     }
 }
 
