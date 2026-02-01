@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 use diesel::prelude::*;
+use serde::Serialize;
 use store::store::Store;
 use store::schema::user::dsl::*;
 
@@ -17,10 +18,11 @@ impl From<diesel::ConnectionError> for HealthError{
 
 impl From<diesel::result::Error> for HealthError{
     fn from(value: diesel::result::Error) -> Self {
-        Self::Query((value))
+        Self::Query(value)
     }
 }       
 
+#[derive(Serialize)]
 pub struct WebsiteHealthResult{
     pub up:bool,
     pub response_time:u128,
