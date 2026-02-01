@@ -2,6 +2,8 @@
 // 1. When creating a website instead of putting the user id obtained after signing up the user should be putting their username 
 // 2. Adding a system that sends notifications via email to let the developer know that the system is down
 
+use std::io::empty;
+
 // Using get and post request handlers from the poem library
 use poem::{
     Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path, Query}
@@ -124,19 +126,31 @@ pub struct Website_check_query{
 }
 
 #[handler]
-async fn  website_health(Query(q): Query<Website_check_query>) -> Result<Query<WebsiteHealthResult>, Error> {
+async fn  website_health(Query(q): Query<Website_check_query>) -> Result<Json<WebsiteHealthResult>, Error> {
     match check_website_health(&q.url).await{
         Ok(result) => {
             println!(
-                "[WEBSITE HEALTH] url={} up={} status={:?} response_time={}ms"
+                "[WEBSITE HEALTH] url={} up={} status={:?} response_time={}ms",
                 q.url,
                 result.up,
                 result.status_code,
                 result.response_time
-            )
-        };
-        
-        Ok(Json(result))
+            );
+                
+            Ok(Json(result))
+        }
+
+        Err(e) => {
+        println!(
+            "[WEBSITE HEALTH] url={} DOWN error={}",
+            q.url,e
+        );
+
+        Err(Error::from_string(
+            e,
+            StatusCode::SERVICE_UNAVAILABLE
+        ))
+    }
     }
 }
 
