@@ -2,8 +2,6 @@
 // 1. When creating a website instead of putting the user id obtained after signing up the user should be putting their username 
 // 2. Adding a system that sends notifications via email to let the developer know that the system is down
 
-use std::io::empty;
-
 // Using get and post request handlers from the poem library
 use poem::{
     Error, Route, Server, get, handler, http::StatusCode, listener::TcpListener, post, web::{Json, Path, Query}
@@ -92,7 +90,7 @@ async fn create_website(Json(data): Json<CreateWebsiteInput> ) -> Result<Json<Cr
         )
         .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
-    Ok(Json(CreateWebsiteOutput { id: website.id }))
+    Ok(Json(CreateWebsiteOutput { id: website.id, msg:"Website created successfully".to_string() }))
 }
 
 #[handler]
