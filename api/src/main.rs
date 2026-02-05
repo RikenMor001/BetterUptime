@@ -83,14 +83,33 @@ async fn create_website(Json(data): Json<CreateWebsiteInput> ) -> Result<Json<Cr
     .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
     // Convert Diesel error into an HTTP 500 instead of crashing
-    let website = s
-        .create_website(
-            data.user_id,
-            data.url,
-        )
-        .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
+    // let website = s
+    //     .create_website(
+    //         data.user_id,
+    //         data.url,
+    //     )
+    //     .map_err(|e| Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR))?;
 
-    Ok(Json(CreateWebsiteOutput { id: website.id, msg:"Website created successfully".to_string() }))
+    // Ok(Json(CreateWebsiteOutput { id: website.id, msg:"Website created successfully".to_string() }))
+    let website = s
+    .create_website(data.user_id, data.url)
+    .map_err(|e| {
+        match e {
+            DieselError::DatabaseError(DatabaseErrorKind::UniqueViolation, _) => {
+                Error::from_string(e.to_string(), StatusCode::CONFLICT)
+            }
+            _=> Error::from_string(e.to_string(), StatusCode::INTERNAL_SERVER_ERROR)        
+        }
+    })?;
+
+    Ok(
+        Json(
+            CreateWebsiteOutput{
+                id,
+                msg: "User has already created a website".to_string()
+            }
+        )
+    )
 }
 
 #[handler]
