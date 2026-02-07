@@ -105,7 +105,7 @@ async fn create_website(Json(data): Json<CreateWebsiteInput> ) -> Result<Json<Cr
     Ok(
         Json(
             CreateWebsiteOutput{
-                id,
+                id: website.id,
                 msg: "User has already created a website".to_string()
             }
         )
