@@ -20,7 +20,12 @@ pub struct WebsiteTick {
 }
 
 impl Store {
-    pub fn save_website_check_results() -> Result<WebsiteTick, diesel::result::Error>{
+    pub fn save_website_check_results(
+        &mut self,
+        website_id: String,
+        response_time_ms: i32, 
+        status: WebsiteStatus
+    ) -> Result<WebsiteTick, diesel::result::Error>{
         let id = Uuid::new_v4().to_string();
 
         let tick = WebsiteTick{
@@ -35,7 +40,6 @@ impl Store {
         diesel::insert_into(website_tick::table)
         .values(&tick)
         .get_result(&mut self.conn)?;
-
-
+        Ok(tick)
     }
 }
