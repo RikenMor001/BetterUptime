@@ -26,10 +26,16 @@ impl Store {
         let tick = WebsiteTick{
             id: id, 
             website_id,
-            region_id,
+            region_id: "default-region-1".to_string(),
             response_time_ms,
             status,
             updated_at: Utc::now().naive_utc()
         };
+
+        diesel::insert_into(website_tick::table)
+        .values(&tick)
+        .get_result(&mut self.conn)?;
+
+
     }
 }
