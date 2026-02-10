@@ -31,8 +31,11 @@ pub fn start_scheduler(){
                 let url = website.url.clone();
                 let website_id = website.id.clone();
 
-                match check_website_health(){
-                    
+                match check_website_health(&url).await {
+                    Ok(result) => {
+                        println!("[check] {} up={} latency={}ms", url, result.up,
+                        result.response_time);
+                    }
                 }
             }
         }
