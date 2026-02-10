@@ -27,18 +27,12 @@ pub fn start_scheduler(){
                 }
             };
 
-            for website in websites {
+            for website in websites{
                 let url = website.url.clone();
-                match check_website_health(&url).await{
-                    Ok(result) => {
-                        println!(
-                            "[check] {} up={} latency={}ms",
-                            url, result.up, result.response_time
-                        );
-                    }
-                    Err(e) => {
-                        println!("[check] {} DOWN err={}", url, e);
-                    }
+                let website_id = website.id.clone();
+
+                match check_website_health(){
+                    
                 }
             }
         }
