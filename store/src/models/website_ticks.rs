@@ -1,7 +1,7 @@
 use crate::store::Store;
 use diesel::prelude::*;
 use uuid::Uuid;
-use chrono::NaiveDateTime;
+use chrono::{NaiveDateTime, Utc};
 use crate::schema::website_tick;
 use crate::schema::sql_types::WebsiteStatus;
 
@@ -26,20 +26,17 @@ impl Store {
         response_time_ms: i32, 
         status: WebsiteStatus
     ) -> Result<WebsiteTick, diesel::result::Error>{
-        let id = Uuid::new_v4().to_string();
-
-        let tick = WebsiteTick{
-            id: id, 
+        let tick = WebsiteTick {
+            id: Uuid::new_v4().to_string(),
             website_id,
             region_id: "default-region-1".to_string(),
             response_time_ms,
             status,
-            updated_at: Utc::now().naive_utc()
+            updated_at: Utc::now().naive_utc(),
         };
 
         diesel::insert_into(website_tick::table)
-        .values(&tick)
-        .get_result(&mut self.conn)?;
-        Ok(tick)
+            .values(&tick)
+            .get_result(&mut self.conn)
     }
 }
