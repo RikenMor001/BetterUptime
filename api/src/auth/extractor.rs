@@ -9,7 +9,6 @@ use crate::auth::validation::verify_jwt;
 pub struct AuthUser {
     pub user_id: String,
 }
-
 impl<'a> FromRequest<'a> for AuthUser {
     async fn from_request(req: &'a Request, _body: &mut RequestBody) -> Result<Self> {
         // Prefer typed header name
@@ -47,7 +46,8 @@ impl<'a> FromRequest<'a> for AuthUser {
                 ));
             }
 
-            // If there are extra segments, treat as invalid (helps catch malformed headers)
+            // If there are extra segments, tr
+            eat as invalid (helps catch malformed headers)
             if parts.next().is_some() {
                 return Err(Error::from_string(
                     "Malformed Authorization header",
