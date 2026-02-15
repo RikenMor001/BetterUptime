@@ -1,4 +1,7 @@
+use diesel::prelude::*;
 
+#[derive(Queryable, Insertable, Selectable)]
+#[diesel(table_name = notification)]
 pub struct Notification{
     pub id: String,
     pub user_id: String,
