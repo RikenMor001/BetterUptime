@@ -10,3 +10,9 @@ pub struct Notification{
     pub notify_down: bool,
     pub created_at: chrono::DateTime<chrono::Utc>,
 }
+
+impl Store {
+    pub fn create_notification(&mut self, website_id: String) -> Result<Notification, diesel::result::Error>{
+
+    }
+}
