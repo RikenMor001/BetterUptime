@@ -1,4 +1,5 @@
 use diesel::prelude::*;
+use crate::schema::notification;
 
 #[derive(Queryable, Insertable, Selectable)]
 #[diesel(table_name = notification)]
@@ -12,7 +13,7 @@ pub struct Notification{
 }
 
 impl Store {
-    pub fn create_notification(&mut self, website_id: String) -> Result<Notification, diesel::result::Error>{
-
+    pub fn create_notification(&mut self, website_id: String) -> Result<Vec<String>, diesel::result::Error>{
+        
     }
 }
