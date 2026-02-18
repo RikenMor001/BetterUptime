@@ -14,6 +14,9 @@ pub struct Notification{
 
 impl Store {
     pub fn create_notification(&mut self, website_id: String) -> Result<Vec<String>, diesel::result::Error>{
-        
+        use crate::schema::{website, notification};
+        website::table
+        .inner_join(notification::table.on(notification::website_id.eq(website::user_id)))
+        .filter(website::id.eq(website_id))
     }
 }
