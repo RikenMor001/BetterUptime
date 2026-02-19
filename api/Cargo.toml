@@ -13,4 +13,4 @@ dotenvy = "0.15"
 diesel = { version = "2.2.0", features = ["postgres"] }
 chrono = "0.4.43"
 reqwest = { version = "0.13.1", features = ["json"]}
-lettre = {version = "0.11", features = ["tokio1"]}
+lettre = {version = "0.11",default-features = false, features = ["tokio1", "tokio1-rustls-tls"]}
