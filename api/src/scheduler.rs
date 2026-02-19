@@ -35,6 +35,12 @@ pub fn start_scheduler(){
                     Ok(result) => {
                         println!("[check] {} up={} latency={}ms", url, result.up,
                         result.response_time);
+
+                        // Save the results and update the website status
+                        // in the log itself locally as of now.
+                    }
+                    Err(e) => {
+                        eprintln!("[check] {} ERROR: {}, website_id: {}", url, e, website_id)
                     }
                 }
             }
