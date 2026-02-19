@@ -17,4 +17,7 @@ pub fn send_downtime_alert(to_email: &str, website_url: &str, status: &str) -> R
     .map_err(|_| "Failed to connect to the SMTP server")?
     .credentials(creds)
     .build();
+
+    mailer.send(&email).unwrap_or_else(|_| panic!("Failed to send email"))?;
+    Ok(())
 }
