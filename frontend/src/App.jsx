@@ -1,12 +1,9 @@
 import './App.css'
 
 function App() {
-
-  return (
-    <div>
-      
-    </div>
-  )
+  return <div className='text-red text-center'>
+    Frontend incoming
+  </div>
 }
 
 export default App
