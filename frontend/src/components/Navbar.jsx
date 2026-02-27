@@ -1,8 +1,7 @@
 export default function NavBar(){
   return <div>
     <div className="justify-between items-center flex px-4 py-3 bg-white shadow-xl fixed w-full z-50 border-b border-gray-200">
-      <div className="text-slate-700 font-bold text-lg
-    hover:text-slate-900 hover:cursor-pointer transition-transform duration-300 hover:-translate-y-0.5">
+      <div className="text-slate-700 font-bold text-xl hover:text-slate-900 hover:cursor-pointer transition-transform duration-300 hover:-translate-y-0.5">
         BetterUptime
       </div>
       <div className="flex gap-4">
