@@ -3,12 +3,12 @@ import NavBar from './components/NavBar'
 
 function App() {
   return (
-    <>
+    <div>
       <NavBar />
-      <main className="mx-auto max-w-6xl px-4 py-8">
-        <p className="text-center text-slate-600">Frontend incoming</p>
-      </main>
-    </>
+      <div className='text-center text-slate-900 font-semibold text-2xl'>
+        Frontend incoming...
+      </div>
+    </div>
   )
 }
 
