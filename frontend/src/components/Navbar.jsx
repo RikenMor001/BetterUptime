@@ -1,19 +1,46 @@
-export default function NavBar(){
-  return <div>
-    <div className="bg-neutral-900 justify-between items-center flex px-4 py-2 shadow-xl fixed w-full z-50 border-b border-neutral-800 h-14">
-      <div className="text-slate-100 font-bold text-xl hover:text-slate-200 hover:cursor-pointer transition-transform duration-300 hover:-translate-y-0.5">
-        BetterUptime
+export default function NavBar() {
+  return (
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-slate-800/80 bg-slate-950/90 backdrop-blur-md">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <a
+          href="/"
+          className="flex items-center gap-2 font-bold tracking-tight text-white transition hover:text-slate-200"
+        >
+          BetterUptime
+        </a>
+
+        <div className="hidden items-center gap-1 sm:flex">
+          <NavLink href="/">Dashboard</NavLink>
+          <NavLink href="/websites">Websites</NavLink>
+          <NavLink href="/alerts">Alerts</NavLink>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <a
+            href="/signin"
+            className="rounded-xl px-4 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-white"
+          >
+            Sign in
+          </a>
+          <a
+            href="/signup"
+            className="rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:brightness-110"
+          >
+            Sign up
+          </a>
+        </div>
       </div>
-      <div className="flex gap-4">
-        <button className="border border-slate-200 shadow-sm rounded-2xl px-4 py-1 text-slate-300 hover:bg-slate-200 hover:cursor-pointer transition-colors duration-300 text-sm font-medium text-center
-        hover:text-slate-900 hover:border-white hover:bg-slate-700 hover:text-white font-semibold transition-transform duration-300 hover:-translate-y-0.5">
-          Sign in
-        </button>
-        <button className="border border-slate-200 shadow-sm rounded-2xl px-4 py-1 text-slate-300 hover:bg-slate-200 hover:cursor-pointer transition-colors duration-300 text-sm font-medium text-center
-        hover:text-slate-900 hover:border-white hover:bg-slate-700 hover:text-white font-semibold transition-transform duration-300 hover:-translate-y-0.5">
-          Sign up
-        </button>
-      </div>
-    </div>
-  </div>
+    </nav>
+  );
+}
+
+function NavLink({ href, children }) {
+  return (
+    <a
+      href={href}
+      className="rounded-xl px-4 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-white"
+    >
+      {children}
+    </a>
+  );
 }
