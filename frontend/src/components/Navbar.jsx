@@ -6,11 +6,11 @@ export default function NavBar() {
     setIsOpen(!isOpen);
   }
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-stone-700 bg-stone-900 shadow-lg">
+    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-stone-700 bg-black shadow-lg">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
         <a
           href="/"
-          className="font-bold tracking-tight text-white transition hover:text-slate-200"
+          className="font-bold tracking-tight text-white transition hover:text-slate-200 text-xl"
           >
           BetterUptime
         </a>
@@ -28,23 +28,17 @@ export default function NavBar() {
         </div>
 
         <div className="flex items-center gap-3">
+          <button className="rounded-lg bg-black text-white px-3 py-2 hover:cursor-pointer hover:bg-white hover:text-black hover:border-2
+          hover:border-black hover:cursor-pointer border-1 border-white text-sm font-semibold hover:font-bold">
             Sign in
-          <button onClick={toggleMenu}>
+          </button>
+          <button onClick={toggleMenu} 
+          className="rounded-lg text-black bg-white rounded-lg px-3 py-2 hover:cursor-pointer hover:bg-black hover:text-white
+          hover:cursor-pointer border-1 border-white hover:border-white text-sm font-semibold hover:font-bold">
             Sign up
           </button>
         </div>
       </div>
     </nav>
-  );
-}
-
-function NavLink({ href, children }) {
-  return (
-    <a
-      href={href}
-      className="rounded-lg px-4 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-white"
-    >
-      {children}
-    </a>
   );
 }
