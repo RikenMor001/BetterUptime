@@ -1,4 +1,10 @@
+import {useState} from "react";
+
 export default function NavBar() {
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  }
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-stone-700 bg-stone-900 shadow-lg">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
@@ -9,25 +15,23 @@ export default function NavBar() {
           BetterUptime
         </a>
 
-        <div className="hidden items-center gap-1 sm:flex">
-          <NavLink href="/">Dashboard</NavLink>
-          <NavLink href="/websites">Websites</NavLink>
-          <NavLink href="/alerts">Alerts</NavLink>
+        <div className="hidden items-center gap-1 sm:flex gap-20 text-stone-200">
+          <div className="hover:cursor-pointer hover:text-stone-300 hover:rounded-lg hover:bg-stone-800 hover:px-3 hover:py-2">
+            Dashboard
+          </div>
+          <div className="hover:cursor-pointer hover:text-stone-300 hover:rounded-lg hover:bg-stone-800 hover:px-3 hover:py-2">
+            Websites
+          </div>
+          <div className="hover:cursor-pointer hover:text-stone-300 hover:rounded-lg hover:bg-stone-800 hover:px-3 hover:py-2">
+            Alerts
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
-          <a
-            href="/signin"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-400 transition hover:bg-slate-800 hover:text-white"
-          >
             Sign in
-          </a>
-          <a
-            href="/signup"
-            className="rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-500"
-          >
+          <button onClick={toggleMenu}>
             Sign up
-          </a>
+          </button>
         </div>
       </div>
     </nav>
