@@ -1,9 +1,10 @@
-import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function NavBar() {
-  const [isOpen, setIsOpen] = useState(false);
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
+  const navigate = useNavigate();
+
+  const handleSingup = () => {
+    navigate("/signup");  
   }
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-stone-700 bg-black shadow-lg">
@@ -32,7 +33,8 @@ export default function NavBar() {
           hover:border-black hover:cursor-pointer border-1 border-white text-sm font-semibold hover:font-bold">
             Sign in
           </button>
-          <button onClick={toggleMenu} 
+          <button 
+          onClick={handleSingup}
           className="rounded-lg text-black bg-white rounded-lg px-3 py-2 hover:cursor-pointer hover:bg-black hover:text-white
           hover:cursor-pointer border-1 border-white hover:border-white text-sm font-semibold hover:font-bold">
             Sign up
